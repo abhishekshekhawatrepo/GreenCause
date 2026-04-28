@@ -1,0 +1,459 @@
+@import "tailwindcss";
+
+/* ================================================================
+   GreenCause Design System
+   Tailwind for structure · Vanilla CSS for emotion-driven effects
+   ================================================================ */
+
+/* --- Design Tokens --- */
+:root {
+  /* Core palette */
+  --gc-bg-primary: #0B1A14;
+  --gc-bg-secondary: #0F2419;
+  --gc-bg-card: #122D1F;
+  --gc-bg-elevated: #183D29;
+
+  /* Emerald greens */
+  --gc-green-50: #E8F5EE;
+  --gc-green-100: #C8E6D5;
+  --gc-green-200: #7BC8A4;
+  --gc-green-400: #34D399;
+  --gc-green-500: #10B981;
+  --gc-green-600: #059669;
+  --gc-green-700: #047857;
+  --gc-green-800: #064E3B;
+  --gc-green-900: #022C22;
+
+  /* Gold accents */
+  --gc-gold-300: #F4D785;
+  --gc-gold-400: #E8C65A;
+  --gc-gold-500: #D4AF37;
+  --gc-gold-600: #B8962E;
+  --gc-gold-700: #8C7323;
+
+  /* Neutrals */
+  --gc-neutral-50: #FAFAF9;
+  --gc-neutral-100: #F5F5F4;
+  --gc-neutral-200: #E7E5E4;
+  --gc-neutral-300: #D6D3D1;
+  --gc-neutral-400: #A8A29E;
+  --gc-neutral-500: #78716C;
+  --gc-neutral-600: #57534E;
+  --gc-neutral-700: #44403C;
+  --gc-neutral-800: #292524;
+  --gc-neutral-900: #1C1917;
+
+  /* Semantic */
+  --gc-text-primary: #F5F5F4;
+  --gc-text-secondary: #A8A29E;
+  --gc-text-muted: #78716C;
+  --gc-text-gold: #D4AF37;
+  --gc-border: rgba(52, 211, 153, 0.12);
+  --gc-border-gold: rgba(212, 175, 55, 0.25);
+
+  /* Glassmorphism */
+  --gc-glass-bg: rgba(18, 45, 31, 0.6);
+  --gc-glass-border: rgba(52, 211, 153, 0.15);
+  --gc-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --gc-glass-blur: 16px;
+
+  /* Spacing & Radius */
+  --gc-radius-sm: 8px;
+  --gc-radius-md: 12px;
+  --gc-radius-lg: 16px;
+  --gc-radius-xl: 24px;
+  --gc-radius-full: 9999px;
+
+  /* Transitions */
+  --gc-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gc-transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gc-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gc-transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Tailwind Theme Extension --- */
+@theme inline {
+  --color-gc-bg-primary: var(--gc-bg-primary);
+  --color-gc-bg-secondary: var(--gc-bg-secondary);
+  --color-gc-bg-card: var(--gc-bg-card);
+  --color-gc-bg-elevated: var(--gc-bg-elevated);
+  --color-gc-green-50: var(--gc-green-50);
+  --color-gc-green-100: var(--gc-green-100);
+  --color-gc-green-200: var(--gc-green-200);
+  --color-gc-green-400: var(--gc-green-400);
+  --color-gc-green-500: var(--gc-green-500);
+  --color-gc-green-600: var(--gc-green-600);
+  --color-gc-green-700: var(--gc-green-700);
+  --color-gc-green-800: var(--gc-green-800);
+  --color-gc-green-900: var(--gc-green-900);
+  --color-gc-gold-300: var(--gc-gold-300);
+  --color-gc-gold-400: var(--gc-gold-400);
+  --color-gc-gold-500: var(--gc-gold-500);
+  --color-gc-gold-600: var(--gc-gold-600);
+  --color-gc-gold-700: var(--gc-gold-700);
+  --color-gc-neutral-50: var(--gc-neutral-50);
+  --color-gc-neutral-100: var(--gc-neutral-100);
+  --color-gc-neutral-200: var(--gc-neutral-200);
+  --color-gc-neutral-300: var(--gc-neutral-300);
+  --color-gc-neutral-400: var(--gc-neutral-400);
+  --color-gc-neutral-500: var(--gc-neutral-500);
+  --color-gc-neutral-600: var(--gc-neutral-600);
+  --color-gc-neutral-700: var(--gc-neutral-700);
+  --color-gc-neutral-800: var(--gc-neutral-800);
+  --color-gc-neutral-900: var(--gc-neutral-900);
+  --color-gc-text-primary: var(--gc-text-primary);
+  --color-gc-text-secondary: var(--gc-text-secondary);
+  --color-gc-text-muted: var(--gc-text-muted);
+  --color-gc-text-gold: var(--gc-text-gold);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+}
+
+/* ================================================================
+   EMOTION-DRIVEN VANILLA CSS
+   Glassmorphism, gradients, animations, micro-interactions
+   ================================================================ */
+
+/* --- Base --- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--gc-bg-primary);
+  color: var(--gc-text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* --- Glassmorphism Cards --- */
+.glass-card {
+  background: var(--gc-glass-bg);
+  backdrop-filter: blur(var(--gc-glass-blur));
+  -webkit-backdrop-filter: blur(var(--gc-glass-blur));
+  border: 1px solid var(--gc-glass-border);
+  border-radius: var(--gc-radius-lg);
+  box-shadow: var(--gc-glass-shadow);
+  transition: transform var(--gc-transition-base),
+              box-shadow var(--gc-transition-base),
+              border-color var(--gc-transition-base);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+              0 0 30px rgba(52, 211, 153, 0.06);
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.glass-card-gold {
+  background: var(--gc-glass-bg);
+  backdrop-filter: blur(var(--gc-glass-blur));
+  -webkit-backdrop-filter: blur(var(--gc-glass-blur));
+  border: 1px solid var(--gc-border-gold);
+  border-radius: var(--gc-radius-lg);
+  box-shadow: var(--gc-glass-shadow);
+  transition: transform var(--gc-transition-base),
+              box-shadow var(--gc-transition-base);
+}
+
+.glass-card-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+              0 0 40px rgba(212, 175, 55, 0.08);
+}
+
+/* --- Gradient Backgrounds --- */
+.gradient-hero {
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 0%,
+    rgba(6, 78, 59, 0.5) 0%,
+    rgba(11, 26, 20, 0.95) 70%,
+    var(--gc-bg-primary) 100%
+  );
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, var(--gc-green-600), var(--gc-green-400));
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, var(--gc-gold-600), var(--gc-gold-400), var(--gc-gold-300));
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, var(--gc-gold-400), var(--gc-gold-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-green {
+  background: linear-gradient(135deg, var(--gc-green-400), var(--gc-green-200));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Gold CTA Button --- */
+.btn-gold {
+  background: linear-gradient(135deg, var(--gc-gold-600), var(--gc-gold-400));
+  color: var(--gc-bg-primary);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--gc-radius-full);
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: transform var(--gc-transition-fast),
+              box-shadow var(--gc-transition-base);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.btn-gold:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 24px rgba(212, 175, 55, 0.35);
+}
+
+.btn-gold:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* --- Green CTA Button --- */
+.btn-green {
+  background: linear-gradient(135deg, var(--gc-green-700), var(--gc-green-500));
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--gc-radius-full);
+  padding: 14px 32px;
+  cursor: pointer;
+  transition: transform var(--gc-transition-fast),
+              box-shadow var(--gc-transition-base);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+  font-size: 0.95rem;
+}
+
+.btn-green:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.3);
+}
+
+/* --- Ghost Button --- */
+.btn-ghost {
+  background: transparent;
+  color: var(--gc-text-primary);
+  font-weight: 500;
+  border: 1px solid var(--gc-glass-border);
+  border-radius: var(--gc-radius-full);
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: all var(--gc-transition-fast);
+}
+
+.btn-ghost:hover {
+  background: rgba(52, 211, 153, 0.08);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* --- Animated Pulse Glow --- */
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(52, 211, 153, 0.2); }
+}
+
+/* --- Floating Orbs (background decoration) --- */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+  animation: orbFloat 12s ease-in-out infinite;
+}
+
+.orb-green {
+  background: var(--gc-green-600);
+}
+
+.orb-gold {
+  background: var(--gc-gold-500);
+  opacity: 0.15;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  33% { transform: translateY(-30px) scale(1.05); }
+  66% { transform: translateY(15px) scale(0.95); }
+}
+
+/* --- Score Badge --- */
+.score-badge {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--gc-green-400);
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--gc-green-400);
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all var(--gc-transition-base);
+}
+
+.score-badge:hover {
+  background: rgba(52, 211, 153, 0.15);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+}
+
+/* --- Countdown Digit --- */
+.countdown-digit {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gc-gold-400), var(--gc-gold-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+/* --- Shimmer Loading --- */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gc-bg-card) 0%,
+    var(--gc-bg-elevated) 50%,
+    var(--gc-bg-card) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Fade-in animation --- */
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Stagger children --- */
+.stagger > * {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* --- Input Styles --- */
+.gc-input {
+  background: rgba(18, 45, 31, 0.4);
+  border: 1px solid var(--gc-glass-border);
+  border-radius: var(--gc-radius-md);
+  padding: 12px 16px;
+  color: var(--gc-text-primary);
+  font-size: 0.95rem;
+  transition: border-color var(--gc-transition-fast),
+              box-shadow var(--gc-transition-fast);
+  outline: none;
+  width: 100%;
+}
+
+.gc-input:focus {
+  border-color: var(--gc-green-400);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.1);
+}
+
+.gc-input::placeholder {
+  color: var(--gc-text-muted);
+}
+
+/* --- Nav Link Underline Effect --- */
+.nav-link {
+  position: relative;
+  color: var(--gc-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--gc-transition-fast);
+  font-size: 0.9rem;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gc-green-400), var(--gc-gold-400));
+  transition: width var(--gc-transition-base);
+  border-radius: 1px;
+}
+
+.nav-link:hover {
+  color: var(--gc-text-primary);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: var(--gc-green-400);
+}
+
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gc-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gc-bg-elevated);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gc-green-800);
+}
+
+/* --- Selection Color --- */
+::selection {
+  background: rgba(52, 211, 153, 0.25);
+  color: var(--gc-text-primary);
+}
