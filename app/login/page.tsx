@@ -22,7 +22,7 @@ function LoginContent() {
     setError("");
 
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -32,7 +32,17 @@ function LoginContent() {
         return;
       }
 
-      router.push(redirect);
+      if (authData.user) {
+        const { data: profile } = await supabase.from("profiles").select("role").eq("id", authData.user.id).single();
+        if (profile?.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push(redirect);
+        }
+      } else {
+        router.push(redirect);
+      }
+      
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabase/client";
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 interface Draw {
@@ -36,11 +35,11 @@ export default function AdminDrawsPage() {
   useEffect(() => { fetchDraws(); }, []);
 
   async function fetchDraws() {
-    const { data } = await supabase
-      .from("draws")
-      .select("*")
-      .order("scheduled_date", { ascending: false });
-    if (data) setDraws(data);
+    const res = await fetch("/api/admin/draws");
+    if (res.ok) {
+      const data = await res.json();
+      setDraws(data);
+    }
     setLoading(false);
   }
 
@@ -67,7 +66,11 @@ export default function AdminDrawsPage() {
   }
 
   async function publishDraw(drawId: string) {
-    await supabase.from("draws").update({ status: "published", published_at: new Date().toISOString() }).eq("id", drawId);
+    await fetch("/api/admin/draws", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ drawId, status: "published" }),
+    });
     fetchDraws();
   }
 
@@ -92,7 +95,6 @@ export default function AdminDrawsPage() {
         </button>
       </motion.div>
 
-      {/* Last result banner */}
       {lastResult && (
         <motion.div
           className={`mb-6 p-5 rounded-xl border ${lastResult.success ? "bg-gc-green-600/10 border-gc-green-400/20" : "bg-red-500/10 border-red-500/20"}`}
@@ -115,7 +117,6 @@ export default function AdminDrawsPage() {
         </motion.div>
       )}
 
-      {/* Draw History */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <span className="w-8 h-8 border-2 border-gc-gold-400/30 border-t-gc-gold-400 rounded-full animate-spin" />
@@ -145,7 +146,7 @@ export default function AdminDrawsPage() {
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {draw.winning_numbers.map((n, j) => (
+                    {(draw.winning_numbers || []).map((n, j) => (
                       <span key={j} className="score-badge !w-9 !h-9 !text-sm !border-gc-gold-400/50 !text-gc-gold-400">{n}</span>
                     ))}
                   </div>

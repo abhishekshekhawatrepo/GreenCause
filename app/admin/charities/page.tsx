@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabase/client";
 
 interface Charity {
   id: string;
@@ -24,8 +23,11 @@ export default function AdminCharitiesPage() {
   useEffect(() => { fetchCharities(); }, []);
 
   async function fetchCharities() {
-    const { data } = await supabase.from("charities").select("*").order("created_at", { ascending: false });
-    if (data) setCharities(data);
+    const res = await fetch("/api/admin/charities");
+    if (res.ok) {
+      const data = await res.json();
+      setCharities(data);
+    }
     setLoading(false);
   }
 
@@ -39,17 +41,16 @@ export default function AdminCharitiesPage() {
     if (!form.name.trim()) return;
 
     if (editingId) {
-      await supabase.from("charities").update({
-        name: form.name,
-        description: form.description,
-        category: form.category,
-      }).eq("id", editingId);
+      await fetch("/api/admin/charities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editingId, name: form.name, description: form.description, category: form.category }),
+      });
     } else {
-      await supabase.from("charities").insert({
-        name: form.name,
-        description: form.description,
-        category: form.category,
-        is_active: true,
+      await fetch("/api/admin/charities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, description: form.description, category: form.category }),
       });
     }
 
@@ -58,13 +59,21 @@ export default function AdminCharitiesPage() {
   }
 
   async function toggleActive(id: string, currentActive: boolean) {
-    await supabase.from("charities").update({ is_active: !currentActive }).eq("id", id);
+    await fetch("/api/admin/charities", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, is_active: !currentActive }),
+    });
     fetchCharities();
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this charity permanently?")) return;
-    await supabase.from("charities").delete().eq("id", id);
+    await fetch("/api/admin/charities", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
     fetchCharities();
   }
 
@@ -88,7 +97,6 @@ export default function AdminCharitiesPage() {
         </button>
       </motion.div>
 
-      {/* Form Modal */}
       <AnimatePresence>
         {showForm && (
           <motion.div
@@ -126,7 +134,6 @@ export default function AdminCharitiesPage() {
         )}
       </AnimatePresence>
 
-      {/* List */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <span className="w-8 h-8 border-2 border-gc-gold-400/30 border-t-gc-gold-400 rounded-full animate-spin" />
@@ -152,15 +159,11 @@ export default function AdminCharitiesPage() {
                 <p className="text-gc-text-muted text-sm mt-1 truncate">{charity.description}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={() => startEdit(charity)} className="text-xs text-gc-text-muted hover:text-gc-gold-400 transition-colors px-3 py-2 rounded-lg border border-gc-green-800/20 hover:border-gc-gold-400/30">
-                  Edit
-                </button>
+                <button onClick={() => startEdit(charity)} className="text-xs text-gc-text-muted hover:text-gc-gold-400 transition-colors px-3 py-2 rounded-lg border border-gc-green-800/20 hover:border-gc-gold-400/30">Edit</button>
                 <button onClick={() => toggleActive(charity.id, charity.is_active)} className="text-xs text-gc-text-muted hover:text-gc-green-400 transition-colors px-3 py-2 rounded-lg border border-gc-green-800/20 hover:border-gc-green-400/30">
                   {charity.is_active ? "Deactivate" : "Activate"}
                 </button>
-                <button onClick={() => handleDelete(charity.id)} className="text-xs text-gc-text-muted hover:text-red-400 transition-colors px-3 py-2 rounded-lg border border-gc-green-800/20 hover:border-red-400/30">
-                  Delete
-                </button>
+                <button onClick={() => handleDelete(charity.id)} className="text-xs text-gc-text-muted hover:text-red-400 transition-colors px-3 py-2 rounded-lg border border-gc-green-800/20 hover:border-red-400/30">Delete</button>
               </div>
             </motion.div>
           ))}

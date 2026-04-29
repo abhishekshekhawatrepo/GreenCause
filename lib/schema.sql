@@ -39,8 +39,7 @@ CREATE TABLE IF NOT EXISTS scores (
   score INTEGER NOT NULL CHECK (score >= 1 AND score <= 45),
   played_date DATE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(user_id, played_date)
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Charities
@@ -56,6 +55,7 @@ CREATE TABLE IF NOT EXISTS charities (
 );
 
 -- Add FK after charities table exists
+ALTER TABLE profiles DROP CONSTRAINT IF EXISTS fk_profiles_charity;
 ALTER TABLE profiles
   ADD CONSTRAINT fk_profiles_charity
   FOREIGN KEY (selected_charity_id) REFERENCES charities(id)
@@ -136,7 +136,22 @@ ALTER TABLE draw_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE winners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE donations ENABLE ROW LEVEL SECURITY;
 
--- Profiles: users can read/update own profile
+-- Dynamically drop ALL existing policies on these tables to clear rogue recursive rules
+DO $$ 
+DECLARE 
+    r RECORD;
+BEGIN 
+    FOR r IN (
+      SELECT policyname, tablename 
+      FROM pg_policies 
+      WHERE schemaname = 'public' 
+      AND tablename IN ('profiles', 'subscriptions', 'scores', 'charities', 'draws', 'draw_entries', 'winners', 'donations')
+    ) 
+    LOOP 
+        EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', r.policyname, r.tablename); 
+    END LOOP; 
+END $$;
+
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
@@ -176,3 +191,15 @@ INSERT INTO charities (name, description, category, is_active) VALUES
   ('Green Fairways Initiative', 'Promoting sustainable golf course management and water conservation.', 'Sustainability', true),
   ('Caddie Welfare Trust', 'Healthcare, education, and financial support for golf caddies and their families.', 'Social Welfare', true),
   ('Swing for Smiles', 'Organising golf charity events to fund cleft palate surgeries for children.', 'Healthcare', true);
+
+-- ================================================================
+-- Storage Buckets (Run this if using Supabase Storage)
+-- ================================================================
+
+INSERT INTO storage.buckets (id, name, public) VALUES ('proofs', 'proofs', true) ON CONFLICT DO NOTHING;
+
+DROP POLICY IF EXISTS "Users can upload their own proofs" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view proofs" ON storage.objects;
+
+CREATE POLICY "Users can upload their own proofs" ON storage.objects FOR INSERT WITH CHECK ( bucket_id = 'proofs' );
+CREATE POLICY "Anyone can view proofs" ON storage.objects FOR SELECT USING ( bucket_id = 'proofs' );

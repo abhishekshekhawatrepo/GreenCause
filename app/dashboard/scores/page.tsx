@@ -34,7 +34,8 @@ export default function ScoresPage() {
       .from("scores")
       .select("*")
       .eq("user_id", user.id)
-      .order("played_date", { ascending: false });
+      .order("played_date", { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (!error && data) setScores(data);
   }
@@ -54,11 +55,11 @@ export default function ScoresPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError("Please log in"); setLoading(false); return; }
 
-    const { error: insertError } = await supabase.from("scores").upsert({
+    const { error: insertError } = await supabase.from("scores").insert({
       user_id: user.id,
       score,
       played_date: dateInput,
-    }, { onConflict: "user_id,played_date" });
+    });
 
     if (insertError) {
       setError(insertError.message);

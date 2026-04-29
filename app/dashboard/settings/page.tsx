@@ -8,6 +8,7 @@ import { CHARITY_TIERS } from "@/lib/constants";
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState({ full_name: "", email: "", charity_percentage: 10 });
+  const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const router = useRouter();
@@ -19,6 +20,9 @@ export default function SettingsPage() {
     if (!user) return;
     const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
     if (data) setProfile({ full_name: data.full_name, email: data.email, charity_percentage: data.charity_percentage });
+
+    const { data: subData } = await supabase.from("subscriptions").select("*").eq("user_id", user.id).eq("status", "active").single();
+    if (subData) setSubscription(subData);
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -87,8 +91,17 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold font-[family-name:var(--font-outfit)] mb-4">Account</h2>
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-gc-bg-card/30 border border-gc-green-800/10">
-              <h3 className="text-sm font-semibold mb-1">Subscription</h3>
-              <p className="text-gc-text-muted text-xs">Manage your subscription from the pricing page.</p>
+              <h3 className="text-sm font-semibold mb-2">Subscription</h3>
+              {subscription ? (
+                <div>
+                  <p className="text-gc-green-400 text-sm font-bold mb-1">
+                    Active <span className="text-gc-text-muted font-normal">• ₹{subscription.amount_inr} / {subscription.plan_type === "monthly" ? "Month" : "Year"}</span>
+                  </p>
+                  <p className="text-gc-text-secondary text-xs">Renews: {new Date(subscription.current_period_end).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
+                </div>
+              ) : (
+                <p className="text-gc-text-muted text-xs">No active subscription found.</p>
+              )}
             </div>
             <button onClick={handleLogout} className="w-full py-3 rounded-xl text-sm font-semibold border border-red-500/30 text-red-400 bg-red-500/5 hover:bg-red-500/10 transition-all" id="logout-btn">
               Sign Out

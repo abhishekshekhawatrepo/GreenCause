@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabase/client";
 import { CURRENCY_SYMBOL } from "@/lib/constants";
 
 interface Stats {
@@ -28,33 +27,17 @@ export default function AdminOverviewPage() {
   }, []);
 
   async function fetchStats() {
-    const [
-      { count: users },
-      { count: activeSubs },
-      { data: subs },
-      { count: charities },
-      { count: draws },
-    ] = await Promise.all([
-      supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
-      supabase.from("subscriptions").select("amount_inr, plan_type").eq("status", "active"),
-      supabase.from("charities").select("*", { count: "exact", head: true }).eq("is_active", true),
-      supabase.from("draws").select("*", { count: "exact", head: true }),
-    ]);
-
-    const monthlyRevenue = (subs || []).reduce((sum, s) => {
-      if (s.plan_type === "yearly") return sum + (Number(s.amount_inr) / 12);
-      return sum + Number(s.amount_inr);
-    }, 0);
-
-    setStats({
-      totalUsers: users || 0,
-      activeSubscriptions: activeSubs || 0,
-      monthlyRevenue: Math.round(monthlyRevenue),
-      totalCharities: charities || 0,
-      totalDraws: draws || 0,
-    });
-    setLoading(false);
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch admin stats:", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const cards = [

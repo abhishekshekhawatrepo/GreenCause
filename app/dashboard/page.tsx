@@ -52,7 +52,7 @@ export default function DashboardPage() {
       }
     }
 
-    const { data: s } = await supabase.from("scores").select("*").eq("user_id", user.id).order("played_date", { ascending: false }).limit(5);
+    const { data: s } = await supabase.from("scores").select("*").eq("user_id", user.id).order("played_date", { ascending: false }).order("created_at", { ascending: false }).limit(5);
     if (s) setScores(s);
   }
 
@@ -64,9 +64,13 @@ export default function DashboardPage() {
     const score = parseInt(scoreInput);
     if (score < 1 || score > 45) return;
 
-    await supabase.from("scores").upsert({
+    const { error: insertError } = await supabase.from("scores").insert({
       user_id: user.id, score, played_date: dateInput,
-    }, { onConflict: "user_id,played_date" });
+    });
+
+    if (!insertError) {
+      // Scores are no longer deleted; history is kept indefinitely.
+    }
 
     setScoreInput("");
     fetchData();
